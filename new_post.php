@@ -4,7 +4,6 @@
  */
 require_once 'config/database.php';
 require_once 'includes/functions.php';
-requireLogin();
 
 $pageTitle = 'Yeni Yazı Ekle';
 $errors = [];
@@ -45,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             $stmt = $pdo->prepare("INSERT INTO posts (user_id, category_id, title, slug, content, image, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$_SESSION['user_id'], $categoryId, $title, $slug, $content, $image, $status]);
+            $stmt->execute([$_SESSION['user_id'] ?? 1, $categoryId, $title, $slug, $content, $image, $status]);
 
             setFlash('success', 'Yazınız başarıyla yayınlandı!');
             header('Location: post.php?slug=' . $slug);

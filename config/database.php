@@ -5,40 +5,26 @@
  */
 
 // Veritabanı ayarları
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'adiyamanli_blog');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_CHARSET', 'utf8mb4');
+define('DB_FILE', __DIR__ . '/../database.sqlite');
 
 // Site ayarları
-define('SITE_NAME', 'Adıyamanlı Blog');
-define('SITE_URL', 'http://localhost/adiyamanli-blog');
+define('SITE_NAME', 'Emrecan Pala Blog');
+define('SITE_URL', 'http://localhost:8081');
 define('SITE_DESC', 'Modern, şık ve kullanıcı dostu blog platformu');
 
 // PDO bağlantısı
 try {
-    // Önce veritabanını oluştur
-    $dsn_initial = "mysql:host=" . DB_HOST . ";charset=" . DB_CHARSET;
-    $pdo_init = new PDO($dsn_initial, DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
-    $pdo_init->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    $pdo_init = null;
-
-    // Veritabanına bağlan
-    $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES   => false,
-    ]);
-
+    $pdo = new PDO("sqlite:" . DB_FILE);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    
+    // Yabancı anahtar desteğini aktif et
+    $pdo->exec("PRAGMA foreign_keys = ON;");
 } catch (PDOException $e) {
     die('<div style="padding:40px;text-align:center;font-family:Inter,sans-serif;color:#ff6b6b;">
         <h2>⚠️ Veritabanı Bağlantı Hatası</h2>
         <p>' . htmlspecialchars($e->getMessage()) . '</p>
-        <p style="color:#999;">Lütfen MySQL servisinin çalıştığından emin olun.</p>
     </div>');
 }
 
@@ -46,58 +32,58 @@ try {
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS `users` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `username` VARCHAR(50) NOT NULL UNIQUE,
     `email` VARCHAR(100) NOT NULL UNIQUE,
     `password` VARCHAR(255) NOT NULL,
     `avatar` VARCHAR(255) DEFAULT 'default.png',
     `bio` TEXT DEFAULT NULL,
-    `role` ENUM('user','admin') DEFAULT 'user',
+    `role` VARCHAR(20) DEFAULT 'user',
     `reset_token` VARCHAR(255) DEFAULT NULL,
     `reset_expires` DATETIME DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 ");
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS `categories` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `slug` VARCHAR(100) NOT NULL UNIQUE,
     `color` VARCHAR(7) DEFAULT '#6c5ce7',
     `icon` VARCHAR(50) DEFAULT '📁',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 ");
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS `posts` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `user_id` INT NOT NULL,
-    `category_id` INT NOT NULL,
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `user_id` INTEGER NOT NULL,
+    `category_id` INTEGER NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `slug` VARCHAR(255) NOT NULL UNIQUE,
     `content` TEXT NOT NULL,
     `image` VARCHAR(255) DEFAULT NULL,
-    `status` ENUM('draft','published') DEFAULT 'published',
-    `views` INT DEFAULT 0,
+    `status` VARCHAR(20) DEFAULT 'published',
+    `views` INTEGER DEFAULT 0,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 ");
 
 $pdo->exec("
 CREATE TABLE IF NOT EXISTS `comments` (
-    `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `post_id` INT NOT NULL,
-    `user_id` INT NOT NULL,
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `post_id` INTEGER NOT NULL,
+    `user_id` INTEGER NOT NULL,
     `content` TEXT NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+);
 ");
 
 // ─── Varsayılan Veriler ─────────────────────────────────────────────

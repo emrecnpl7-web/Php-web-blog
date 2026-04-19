@@ -34,8 +34,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <ul class="nav-links" id="navLinks">
             <li><a href="index.php" class="<?= $currentPage === 'index.php' ? 'active' : '' ?>">🏠 Ana Sayfa</a></li>
             <li><a href="category.php" class="<?= $currentPage === 'category.php' ? 'active' : '' ?>">📂 Kategoriler</a></li>
+            <li><a href="new_post.php" class="<?= $currentPage === 'new_post.php' ? 'active' : '' ?>">✏️ Yazı Ekle</a></li>
             <?php if (isLoggedIn()): ?>
-                <li><a href="new_post.php" class="<?= $currentPage === 'new_post.php' ? 'active' : '' ?>">✏️ Yazı Ekle</a></li>
                 <li><a href="profile.php" class="<?= $currentPage === 'profile.php' ? 'active' : '' ?>">👤 Profilim</a></li>
                 <?php if (isAdmin()): ?>
                     <li><a href="admin/index.php" class="<?= strpos($currentPage, 'admin') !== false ? 'active' : '' ?>">⚙️ Admin</a></li>
