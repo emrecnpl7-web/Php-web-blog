@@ -1,1 +1,1 @@
-# Php-web-blog
+[Sosyal_Medyada_Yapay_Zeka_ile_Dijital_Pazarlama_Sertifika.pdf](https://github.com/user-attachments/files/28679740/Sosyal_Medyada_Yapay_Zeka_ile_Dijital_Pazarlama_Sertifika.pdf)
